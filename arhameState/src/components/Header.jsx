@@ -12,7 +12,7 @@ const Header = () => {
                     </h1>
                 </Link>
                 <form className='bg-slate-100 p-3 rounded-lg flex justify-between items-center'>
-                    <input className='bg-transparent focus:outline-none w-24 sm:w-60' type="search" placeholder='Search...' name="" id="" />
+                    <input className='bg-transparent focus:outline-none w-24 sm:w-60' type="text" placeholder='Search...' name="" id="" />
                     <FaSearch className='text-slate-500' />
                 </form>
                 <ul className='flex gap-3'>
