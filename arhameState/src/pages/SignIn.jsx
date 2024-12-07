@@ -37,7 +37,7 @@ const SignIn = () => {
             {isSuccess && <p className='text-green-600 text-center'>User logged in!</p>}
             <div className='flex gap-2 mt-2'>
                 <p>Don't have an Account?</p>
-                <Link className='text-blue-500' to={'/sign-up'}>Sign-Up</Link>
+                <Link className='text-blue-500' to={'/sign-up'}>Sign Up</Link>
             </div>
         </div>
     )
