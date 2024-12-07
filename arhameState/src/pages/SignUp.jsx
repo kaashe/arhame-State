@@ -2,7 +2,8 @@ import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSignUpMutation } from '../store/api/authSlice';
-import { FaSpinner } from "react-icons/fa";
+import { FaGoogle, FaSpinner } from "react-icons/fa";
+import Oauth from '../components/Oauth';
 const SignUp = () => {
     const { register, reset, handleSubmit, formState: { errors } } = useForm({ mode: 'onBlur' });
     const [SignUp, { isLoading, isError, error, isSuccess, reset: resetMutationState }] = useSignUpMutation();
@@ -40,6 +41,7 @@ const SignUp = () => {
                         {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
                     </span>
                 </button>
+                <Oauth />
             </form>
             {isError && <p className='text-red-400 text-center'>{error.data.error || 'Something went wrong'}</p>}
             {isSuccess && <p className='text-green-600 text-center'>User registered!</p>}

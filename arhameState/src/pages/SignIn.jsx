@@ -3,8 +3,9 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSignInMutation } from '../store/api/authSlice';
 import { useSelector, useDispatch } from 'react-redux'
-import { FaSpinner } from "react-icons/fa";
+import { FaGoogle, FaSpinner } from "react-icons/fa";
 import { signInSuccess } from '../store/user/userSlice';
+import Oauth from '../components/Oauth';
 const SignIn = () => {
     const { register, reset, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
@@ -43,6 +44,7 @@ const SignIn = () => {
                         {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
                     </span>
                 </button>
+                <Oauth />
             </form>
             {isError && <p className='text-red-400 text-center'>{error.data.error || 'Something went wrong'}</p>}
             {isSuccess && <p className='text-green-600 text-center'>User logged in!</p>}
