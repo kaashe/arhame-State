@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSignInMutation } from '../store/api/authSlice';
-
+import { FaSpinner } from "react-icons/fa";
 const SignIn = () => {
     const { register, reset, handleSubmit, formState: { errors } } = useForm();
+    const navigate = useNavigate();
     const [SignIn, { isLoading, isError, error, isSuccess, reset: resetMutationState }] = useSignInMutation();
     const onSubmit = async (data) => {
         try {
@@ -19,6 +20,7 @@ const SignIn = () => {
         if (isSuccess) {
             reset();
             timeout = setTimeout(() => {
+                navigate('/')
             }, 3000);
         }
 
@@ -31,7 +33,12 @@ const SignIn = () => {
             <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 mb-2'>
                 <input type="text" id='username' className={`border p-3 rounded-lg ${errors?.username ? 'border-red-400' : ""}`} placeholder="Username" {...register("username", { required: true, maxLength: 20 })} />
                 <input type="password" id='password' className={`border p-3 rounded-lg ${errors?.password ? 'border-red-400' : ""}`} placeholder="Password" {...register("password", { required: 'Password is required', maxLength: 8 })} />
-                <input disabled={isLoading} className='bg-slate-600 text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit" />
+                <button disabled={isLoading} className='bg-[#F9826C] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
+                    <span className='flex items-center justify-center gap-2 my-auto'>
+                        <span>SUBMIT</span>
+                        {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
+                    </span>
+                </button>
             </form>
             {isError && <p className='text-red-400 text-center'>{error.data.error || 'Something went wrong'}</p>}
             {isSuccess && <p className='text-green-600 text-center'>User logged in!</p>}

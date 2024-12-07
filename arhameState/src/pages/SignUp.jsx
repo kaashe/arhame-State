@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSignUpMutation } from '../store/api/authSlice';
-import { CgSpinner } from "react-icons/cg";
+import { FaSpinner } from "react-icons/fa";
 const SignUp = () => {
     const { register, reset, handleSubmit, formState: { errors } } = useForm({ mode: 'onBlur' });
     const [SignUp, { isLoading, isError, error, isSuccess, reset: resetMutationState }] = useSignUpMutation();
+    const navigate = useNavigate();
     const onSubmit = async (data) => {
         try {
             const response = await SignUp(data).unwrap();
@@ -19,6 +20,7 @@ const SignUp = () => {
         if (isSuccess) {
             reset();
             timeout = setTimeout(() => {
+                navigate('/sign-in')
             }, 3000);
         }
 
@@ -35,7 +37,7 @@ const SignUp = () => {
                 <button disabled={isLoading} className='bg-[#F9826C] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
                     <span className='flex items-center justify-center gap-2 my-auto'>
                         <span>SUBMIT</span>
-                        {isLoading && <CgSpinner className='mt-[1px] animate-spin' />}
+                        {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
                     </span>
                 </button>
             </form>
