@@ -2,15 +2,19 @@ import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSignInMutation } from '../store/api/authSlice';
+import { useSelector, useDispatch } from 'react-redux'
 import { FaSpinner } from "react-icons/fa";
+import { signInSuccess } from '../store/user/userSlice';
 const SignIn = () => {
     const { register, reset, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
+    const dispatch = useDispatch()
     const [SignIn, { isLoading, isError, error, isSuccess, reset: resetMutationState }] = useSignInMutation();
     const onSubmit = async (data) => {
         try {
             const response = await SignIn(data).unwrap();
             console.log("Success:", response);
+            dispatch(signInSuccess(response))
         } catch (error) {
             console.error("Error:", error);
         }
