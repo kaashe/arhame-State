@@ -1,7 +1,14 @@
 import React from 'react'
 import { FaSearch } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux'
+import { VscSignOut } from "react-icons/vsc";
+
 const Header = () => {
+    const currentuser = useSelector((state) => state?.user?.currentuser)
+    console.log('current user', currentuser);
+
+
     return (
         <header className='bg-[#e9e9ed] shadow-sm'>
             <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
@@ -18,7 +25,13 @@ const Header = () => {
                 <ul className='flex gap-3'>
                     <Link to={'/'}>  <li className='hidden sm:inline text-slate-700 hover:underline'>Home</li>  </Link>
                     <Link to={'/about'}> <li className='hidden sm:inline text-slate-700 hover:underline'>About</li></Link>
-                    <Link to={'/sign-in'}><li className=' text-slate-700 hover:underline'>Sign in</li></Link>
+                    {currentuser?.user ? (
+                        <li className='text-slate-700'>Welcome, {currentuser?.user}</li>
+                    ) : (
+                        <Link to={'/sign-in'}>
+                            <li className='text-slate-700 hover:underline'>Sign in</li>
+                        </Link>
+                    )}
                 </ul>
             </div>
         </header>

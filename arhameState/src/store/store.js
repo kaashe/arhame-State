@@ -7,7 +7,11 @@ import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 userSlice;
 
-const rootReducer = combineReducers({ userReducer: userSlice });
+const rootReducer = combineReducers({
+  user: userSlice, // Use `user` as the key for better semantics
+  [baseApi.reducerPath]: baseApi.reducer, // Add RTK Query reducer
+  [userApi.reducerPath]: userApi.reducer,
+});
 const persistConfig = {
   key: "root",
   storage,
@@ -15,11 +19,7 @@ const persistConfig = {
 };
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
-  reducer: {
-    [baseApi.reducerPath]: baseApi.reducer, // Add RTK Query reducer
-    [userApi.reducerPath]: userApi.reducer,
-    persistedReducer,
-  },
+  reducer: persistedReducer, // Replace rootReducer with persistedReducer
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

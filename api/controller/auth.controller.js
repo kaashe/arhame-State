@@ -1,6 +1,8 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+
+// signup controller
 export const singup = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
@@ -23,6 +25,7 @@ export const singup = async (req, res, next) => {
   }
 };
 
+// signup controller
 export const signin = async (req, res, next) => {
   const { username, password } = req?.body;
   try {
@@ -46,5 +49,46 @@ export const signin = async (req, res, next) => {
   } catch (error) {
     console.log("error", error);
     next(error.mess);
+  }
+};
+
+// googl
+export const google = async (req, res, next) => {
+  try {
+    const userExists = await User.findOne({ email: req.body.email });
+    if (userExists) {
+      const token = jwt.sign({ id: userExists.id }, process.env.JWT_SECRET);
+      // const { password: pass, ...rest } = userExists._doc;
+      res
+        .cookie("access_token", token, {
+          httpOnly: true,
+          // expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        })
+        .status(200)
+        .json({ message: "Logged in successfully!" });
+    } else {
+      const generatePassword = Math.random().toString(36).slice(-8);
+      const hashPassword = bcryptjs.hashSync(generatePassword, 10);
+      const newUser = new User({
+        username: req.body.user,
+        email: req.body.email,
+        password: hashPassword,
+        avatar: req.body.photoURL,
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET);
+      const { password: pass, ...rest } = newUser._doc;
+      res
+        .cookie("access_token", token, {
+          httpOnly: true,
+          // expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        })
+        .status(200)
+        .json({ message: "User registered successfully!" });
+    }
+  } catch (error) {
+    console.log(error, "the error");
+
+    next(error);
   }
 };

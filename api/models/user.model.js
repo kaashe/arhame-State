@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    avatar: {
+      type: String,
+      default:
+        "https://lh3.googleusercontent.com/a/ACg8ocIzfvd8719dc1fXIRhkryKNahP1i0Bc4_Ma6E-nmxmFjw-dWQ=s96-c",
+    },
   },
   { timestamps: true }
 );
