@@ -7,8 +7,6 @@ import { VscSignOut } from "react-icons/vsc";
 const Header = () => {
     const currentuser = useSelector((state) => state?.user?.currentuser)
     console.log('current user', currentuser);
-
-
     return (
         <header className='bg-[#e9e9ed] shadow-sm'>
             <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
@@ -22,11 +20,17 @@ const Header = () => {
                     <input className='bg-transparent focus:outline-none w-24 sm:w-60' type="text" placeholder='Search...' name="" id="" />
                     <FaSearch className='text-slate-500' />
                 </form>
-                <ul className='flex gap-3'>
+                <ul className='flex items-center gap-3'>
                     <Link to={'/'}>  <li className='hidden sm:inline text-slate-700 hover:underline'>Home</li>  </Link>
                     <Link to={'/about'}> <li className='hidden sm:inline text-slate-700 hover:underline'>About</li></Link>
-                    {currentuser?.user ? (
-                        <li className='text-slate-700'>Welcome, {currentuser?.user}</li>
+                    {currentuser ? (
+                        <Link to={'/profile'}>
+                            <img
+                                alt=""
+                                src={currentuser?.photoURL || "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"}
+                                className="inline-block size-10 rounded-full ring-2 ring-white"
+                            />
+                        </Link>
                     ) : (
                         <Link to={'/sign-in'}>
                             <li className='text-slate-700 hover:underline'>Sign in</li>
