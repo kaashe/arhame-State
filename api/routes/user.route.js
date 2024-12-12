@@ -4,6 +4,6 @@ import { test } from "../controller/user.controller.js";
 const router = express.Router();
 
 router.get("/test", test);
-router.get("/update/:id", updateUser);
+// router.get("/update/:id", updateUser);
 
 export default router;
