@@ -18,8 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default:
-        "https://lh3.googleusercontent.com/a/ACg8ocIzfvd8719dc1fXIRhkryKNahP1i0Bc4_Ma6E-nmxmFjw-dWQ=s96-c",
+      default: "https://via.placeholder.com/150",
     },
   },
   { timestamps: true }

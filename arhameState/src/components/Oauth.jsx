@@ -15,16 +15,18 @@ const Oauth = () => {
             const provider = new GoogleAuthProvider();
             const auth = getAuth(app);
             const result = await signInWithPopup(auth, provider)
-            console.log(result?.user, 'res');
+            console.log(result?.user, 'logged in with o-auth user');
             await google({
                 user: result?.user.displayName,
                 email: result?.user.email,
-                photoURL: result?.user.photoURL
+                photoURL: result?.user.photoURL,
+
             })
             dispatch(signInSuccess({
                 user: result?.user.displayName,
                 email: result?.user.email,
-                photoURL: result?.user.photoURL
+                photoURL: result?.user.photoURL,
+                id: result?.user.uid
             }))
         } catch (error) {
             console.log('Could not sign in with google', error);

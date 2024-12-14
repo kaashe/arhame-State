@@ -20,6 +20,13 @@ export const userApi = baseApi.injectEndpoints({
         body: user,
       }),
     }),
+    updateUser: builder.mutation({
+      query: ({ id, user }) => ({
+        url: `user/update/${id}`,
+        method: "POST",
+        body: user,
+      }),
+    }),
     google: builder.mutation({
       query: (user) => ({
         url: "auth/google",
@@ -31,5 +38,9 @@ export const userApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useSignUpMutation, useSignInMutation, useGoogleMutation } =
-  userApi;
+export const {
+  useSignUpMutation,
+  useSignInMutation,
+  useUpdateUserMutation,
+  useGoogleMutation,
+} = userApi;
