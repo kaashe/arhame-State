@@ -4,15 +4,19 @@ import { FaSpinner } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { signInSuccess } from '../store/user/userSlice';
-import { useUpdateUserMutation } from '../store/api/authSlice';
+import { useDeleteteUserMutation, useSignOutUserQuery, useUpdateUserMutation } from '../store/api/authSlice';
+import { useNavigate } from 'react-router-dom';
 const Profile = () => {
     const fileRef = useRef();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [file, setFile] = useState();
     const [uploading, setUploading] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const currentuser = useSelector((state) => state?.user?.currentuser);
     const [updateUser, { isLoading, isSuccess, isError, error }] = useUpdateUserMutation();
+    const [deleteUser, { isLoading: isDeleteLoading, isSuccess: isDeleteSuccess, isError: DeleteIsError, error: DeletError }] = useDeleteteUserMutation();
+    const { data: signOutData, isLoading: isSignOutLoading, isSuccess: isSignOutSuccess, isError: SignOutisError, refetch } = useSignOutUserQuery();
     const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm();
     console.log(currentuser, 'currentuser');
 
@@ -73,7 +77,34 @@ const Profile = () => {
             console.error('Image upload failed. Form submission aborted.');
         }
     };
-
+    const deleteUserHandler = async (id) => {
+        try {
+            const response = await deleteUser(id);
+            console.log('response', response);
+            if (response?.data) {
+                setTimeout(() => {
+                    dispatch(signInSuccess({}));
+                    navigate('/sign-in');
+                }, 1000)
+            }
+        } catch (error) {
+            console.log('Error while deleting user', error);
+        }
+    }
+    const signOutUserHandler = async () => {
+        try {
+            const response = await refetch();
+            console.log('response', response);
+            if (response?.data) {
+                setTimeout(() => {
+                    dispatch(signInSuccess({}));
+                    navigate('/sign-in');
+                }, 1000)
+            }
+        } catch (error) {
+            console.log('Error while logging out user', error);
+        }
+    }
     useEffect(() => {
         if (currentuser) {
             reset({
@@ -102,14 +133,16 @@ const Profile = () => {
                 <button disabled={false} className='bg-[#009688] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
                     <span className='flex items-center justify-center gap-2 my-auto'>
                         <span>UPDATE</span>
-                        {uploading && <FaSpinner className='mt-[1px] animate-spin' />}
+                        {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
                     </span>
                 </button>
                 {isSuccess && <p className='text-green-600 text-center'>User Updated!</p>}
+                {isDeleteSuccess && <p className='text-green-600 text-center'>User Deleted!</p>}
                 {isError && <p className='text-red-400 text-center'>Failed Updating User!</p>}
+                {DeleteIsError && <p className='text-red-400 text-center'>Failed Deleting User!</p>}
                 <div className="flex justify-between">
-                    <div className="text-red-500">Delete Account</div>
-                    <div className="text-red-500">Sign Out</div>
+                    <div onClick={() => deleteUserHandler(currentuser?._id)} className={`text-red-500 cursor-pointer ${isDeleteLoading && 'animate-pulse'}`}>Delete Account</div>
+                    <div onClick={signOutUserHandler} className="text-red-500 cursor-pointer">Sign Out</div>
                 </div>
             </form>
         </div>

@@ -27,6 +27,18 @@ export const userApi = baseApi.injectEndpoints({
         body: user,
       }),
     }),
+    deleteteUser: builder.mutation({
+      query: (id) => ({
+        url: `user/delete/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    signOutUser: builder.query({
+      query: (id) => ({
+        url: "user/sign-out",
+        method: "GET",
+      }),
+    }),
     google: builder.mutation({
       query: (user) => ({
         url: "auth/google",
@@ -42,5 +54,7 @@ export const {
   useSignUpMutation,
   useSignInMutation,
   useUpdateUserMutation,
+  useDeleteteUserMutation,
+  useSignOutUserQuery,
   useGoogleMutation,
 } = userApi;

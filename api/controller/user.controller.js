@@ -38,3 +38,30 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+//delete user
+
+export const deleteUser = async (req, res, next) => {
+  const userId = req.user.id;
+  const paramsId = req.params.id;
+
+  if (userId !== paramsId) {
+    return res.status(401).json({ error: "user not found!:deleteUser" });
+  }
+  try {
+    const deleteuser = await User.findByIdAndDelete(paramsId);
+    const { password: pass, ...rest } = deleteuser._doc;
+    res.clearCookie("access_token");
+    res.status(200).json("User Deleted!");
+  } catch (error) {
+    next(error);
+  }
+};
+export const signOut = async (req, res, next) => {
+  try {
+    res.clearCookie("access_token");
+    res.status(200).json("User has been logged out!");
+  } catch (error) {
+    next(error);
+  }
+};
