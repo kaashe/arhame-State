@@ -16,7 +16,7 @@ const Profile = () => {
     const currentuser = useSelector((state) => state?.user?.currentuser);
     const [updateUser, { isLoading, isSuccess, isError, error }] = useUpdateUserMutation();
     const [deleteUser, { isLoading: isDeleteLoading, isSuccess: isDeleteSuccess, isError: DeleteIsError, error: DeletError }] = useDeleteteUserMutation();
-    const { data: signOutData, isLoading: isSignOutLoading, isSuccess: isSignOutSuccess, isError: SignOutisError, refetch } = useSignOutUserQuery();
+    // const { data: signOutData, isLoading: isSignOutLoading, isSuccess: isSignOutSuccess, isError: SignOutisError, refetch } = useSignOutUserQuery();
     const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm();
     console.log(currentuser, 'currentuser');
 
@@ -91,20 +91,20 @@ const Profile = () => {
             console.log('Error while deleting user', error);
         }
     }
-    const signOutUserHandler = async () => {
-        try {
-            const response = await refetch();
-            console.log('response', response);
-            if (response?.data) {
-                setTimeout(() => {
-                    dispatch(signInSuccess({}));
-                    navigate('/sign-in');
-                }, 1000)
-            }
-        } catch (error) {
-            console.log('Error while logging out user', error);
-        }
-    }
+    // const signOutUserHandler = async () => {
+    //     try {
+    //         const response = await refetch();
+    //         console.log('response', response);
+    //         if (response?.data) {
+    //             setTimeout(() => {
+    //                 dispatch(signInSuccess({}));
+    //                 navigate('/sign-in');
+    //             }, 1000)
+    //         }
+    //     } catch (error) {
+    //         console.log('Error while logging out user', error);
+    //     }
+    // }
     useEffect(() => {
         if (currentuser) {
             reset({
@@ -130,10 +130,15 @@ const Profile = () => {
                 <input type="text" id='username' className={`border p-3 rounded-lg ${errors?.username ? 'border-red-400' : ""}`} placeholder="Username" {...register("username", { required: true, maxLength: 20 })} />
                 <input type="email" id='email' className={`border p-3 rounded-lg ${errors?.email ? 'border-red-400' : ""}`} placeholder="Email" {...register("email", { required: 'Email required' })} />
                 <input type="password" id='password' className={`border p-3 rounded-lg ${errors?.password ? 'border-red-400' : ""}`} placeholder="Password" {...register("password", { required: 'Password is required', maxLength: 8 })} />
-                <button disabled={false} className='bg-[#009688] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
+                <button disabled={isLoading} className='bg-[#009688] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
                     <span className='flex items-center justify-center gap-2 my-auto'>
                         <span>UPDATE</span>
                         {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
+                    </span>
+                </button>
+                <button onClick={() => navigate('/create-listing')} className='bg-[#F9826C] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
+                    <span className='flex items-center justify-center gap-2 my-auto'>
+                        <span>Create Listing</span>
                     </span>
                 </button>
                 {isSuccess && <p className='text-green-600 text-center'>User Updated!</p>}
@@ -142,7 +147,7 @@ const Profile = () => {
                 {DeleteIsError && <p className='text-red-400 text-center'>Failed Deleting User!</p>}
                 <div className="flex justify-between">
                     <div onClick={() => deleteUserHandler(currentuser?._id)} className={`text-red-500 cursor-pointer ${isDeleteLoading && 'animate-pulse'}`}>Delete Account</div>
-                    <div onClick={signOutUserHandler} className="text-red-500 cursor-pointer">Sign Out</div>
+                    <div className="text-red-500 cursor-pointer">Sign Out</div>
                 </div>
             </form>
         </div>
