@@ -47,6 +47,12 @@ export const userApi = baseApi.injectEndpoints({
         credentials: "include",
       }),
     }),
+    getListing: builder.query({
+      query: (id) => ({
+        url: `user/listing/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -57,4 +63,5 @@ export const {
   useDeleteteUserMutation,
   useSignOutUserQuery,
   useGoogleMutation,
+  useGetListingQuery,
 } = userApi;

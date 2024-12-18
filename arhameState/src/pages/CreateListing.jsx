@@ -4,10 +4,11 @@ import { FaSpinner } from 'react-icons/fa';
 import axios from 'axios';
 import { useCreateListingMutation } from '../store/api/listingSlice';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const CreateListing = () => {
     const currentuser = useSelector((state) => state?.user?.currentuser);
-
+    const navigate = useNavigate();
     const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm();
     const [file, setFile] = useState([]);
     const [uploading, setUploading] = useState(false);
@@ -44,6 +45,10 @@ const CreateListing = () => {
             setImageError("You can select a maximum of 6 images.");
             return; // Prevent further action if max limit exceeded
         }
+        if (file?.length + selectedFiles?.length < 1) {
+            setImageError("You must upload at least one image");
+            return; // Prevent further action if max limit exceeded
+        }
 
         setUploading(true);
 
@@ -55,11 +60,24 @@ const CreateListing = () => {
         setUploading(false);
     }
     const onSubmit = async (data) => {
+        if (file?.length < 1) {
+            setImageError("You must upload at least one image");
+            return; // Prevent further action if max limit exceeded
+        }
+        if (data?.regularPrice < data?.discountPrice) {
+            setImageError("Regular price must be higher then discount price");
+            return; // Prevent further action if max limit exceeded
+        }
         const payload = { imageUrls: file, userRef: currentuser?._id || currentuser?.id, ...data };
         try {
             const response = await createListing(payload);
             console.log('response saving', response?.data);
-            if (response?.data?.status === 201) { reset() }
+            if (response?.data?.status === 201) {
+                reset()
+                setTimeout(() => {
+                    navigate('/')
+                }, 2000)
+            }
         } catch (error) {
             console.error('Error while creating list:', error);
         }
@@ -73,9 +91,9 @@ const CreateListing = () => {
             <h1 className='text-3xl text-center font-semibold my-7'>Create Listing</h1>
             <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col sm:flex-row gap-3 sm:gap-6'>
                 <div className="flex flex-col gap-4 flex-1">
-                    <input type="text" id='name' className={`border p-3 rounded-lg ${errors?.name ? 'border-red-400' : ""}`} placeholder="name" {...register("name", { required: 'Name is required', minLength: 10, maxLength: 62 })} />
-                    <textarea type="text" id='description' className={`bg-[#E8F0FE] border p-3 rounded-lg ${errors?.description ? 'border-red-400' : ""}`} placeholder="description" {...register("description", { required: 'Description is required' })} />
-                    <input type="text" id='address' className={`border p-3 rounded-lg ${errors?.address ? 'border-red-400' : ""}`} placeholder="address" {...register("address", { required: 'Address is required' })} />
+                    <input type="text" id='name' className={`border p-3 rounded-lg ${errors?.name ? 'border-red-400' : ""}`} placeholder="Name" {...register("name", { required: 'Name is required', minLength: 10, maxLength: 62 })} />
+                    <textarea type="text" id='description' className={`bg-[#E8F0FE] border p-3 rounded-lg ${errors?.description ? 'border-red-400' : ""}`} placeholder="Description" {...register("description", { required: 'Description is required' })} />
+                    <input type="text" id='address' className={`border p-3 rounded-lg ${errors?.address ? 'border-red-400' : ""}`} placeholder="Address" {...register("address", { required: 'Address is required' })} />
                     <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
                         {/* Sale Checkbox */}
                         <div className="flex gap-2 items-center">
@@ -219,15 +237,15 @@ const CreateListing = () => {
                         {uploading && <FaSpinner className='mt-[1px] animate-spin' />}
                         <input onChange={handleImageChange} multiple type="file" name="imageUrls" id="imageUrls" accept='image/*' />
                     </div>
-                    <div>
+                    {/* <div>
                         <h3>Selected Images:</h3>
                         <ul>
-                            {file.map((image, index) => (
+                            {file?.map((image, index) => (
                                 <li key={index}>{image.name}</li>
                             ))}
                         </ul>
-                    </div>
-                    <p className='text-red-400 text-center'>{imageError}</p>
+                    </div> */}
+                    <p className='text-red-400'>{imageError}</p>
                     <button disabled={isCreateListingLoading} type="submit" className='mt-3 w-96 py-1 rounded bg-green-600 text-white' value="">
                         <span className='flex items-center justify-center gap-2 my-auto'>
                             <span>Create Listing</span>

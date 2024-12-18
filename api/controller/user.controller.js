@@ -1,5 +1,6 @@
 import bcryptjs from "bcryptjs";
 import User from "../models/user.model.js";
+import Listing from "../models/listing.model.js";
 export const test = (req, res) => {
   res.json({
     message: "route is working!",
@@ -61,6 +62,20 @@ export const signOut = async (req, res, next) => {
   try {
     res.clearCookie("access_token");
     res.status(200).json("User has been logged out!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserLsiting = async (req, res, next) => {
+  const userId = req.user.id;
+  const paramsId = req.params.id;
+
+  try {
+    if (userId === paramsId) {
+      const listing = await Listing.find({ userRef: req.params.id });
+      res.status(200).json(listing);
+    }
   } catch (error) {
     next(error);
   }

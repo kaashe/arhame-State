@@ -4,7 +4,7 @@ import { FaSpinner } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { signInSuccess } from '../store/user/userSlice';
-import { useDeleteteUserMutation, useSignOutUserQuery, useUpdateUserMutation } from '../store/api/authSlice';
+import { useDeleteteUserMutation, useGetListingQuery, useUpdateUserMutation } from '../store/api/authSlice';
 import { useNavigate } from 'react-router-dom';
 const Profile = () => {
     const fileRef = useRef();
@@ -14,11 +14,12 @@ const Profile = () => {
     const [uploading, setUploading] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const currentuser = useSelector((state) => state?.user?.currentuser);
+    const id = currentuser?._id || currentuser?.id;
     const [updateUser, { isLoading, isSuccess, isError, error }] = useUpdateUserMutation();
     const [deleteUser, { isLoading: isDeleteLoading, isSuccess: isDeleteSuccess, isError: DeleteIsError, error: DeletError }] = useDeleteteUserMutation();
-    // const { data: signOutData, isLoading: isSignOutLoading, isSuccess: isSignOutSuccess, isError: SignOutisError, refetch } = useSignOutUserQuery();
+    const { data: listingData, isLoading: isListingLoading, isError: ListingisError, refetch } = useGetListingQuery(id);
     const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm();
-    console.log(currentuser, 'currentuser');
+    console.log(listingData, 'listingData');
 
     const handleImageUpload = async () => {
         console.log('process started');
@@ -91,20 +92,18 @@ const Profile = () => {
             console.log('Error while deleting user', error);
         }
     }
-    // const signOutUserHandler = async () => {
-    //     try {
-    //         const response = await refetch();
-    //         console.log('response', response);
-    //         if (response?.data) {
-    //             setTimeout(() => {
-    //                 dispatch(signInSuccess({}));
-    //                 navigate('/sign-in');
-    //             }, 1000)
-    //         }
-    //     } catch (error) {
-    //         console.log('Error while logging out user', error);
-    //     }
-    // }
+    const signOutUserHandler = async () => {
+        try {
+            localStorage.clear();
+
+            setTimeout(() => {
+                dispatch(signInSuccess({}));
+                navigate('/sign-in');
+            }, 1000)
+        } catch (error) {
+            console.log('Error while logging out user', error);
+        }
+    }
     useEffect(() => {
         if (currentuser) {
             reset({
@@ -117,40 +116,74 @@ const Profile = () => {
     }, [reset, currentuser]);
 
     return (
-        <div className='px-3 max-w-lg mx-auto'>
-            <h1 className='text-3xl text-center font-semibold my-7' >Profile</h1>
-            <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 mb-2'>
-                <input onChange={(e) => setFile(e.target.files[0])} hidden ref={fileRef} type="file" name="" id="" accept='image/*' />
-                <img
-                    onClick={() => fileRef.current.click()}
-                    alt=""
-                    src={imageUrl || currentuser?.avatar}
-                    className={`cursor-pointer self-center my-2 object-cover size-20 rounded-full ${uploading ? "ring-4 ring-[#009688] animate-pulse" : "ring-2 ring-black "} `}
-                />
-                <input type="text" id='username' className={`border p-3 rounded-lg ${errors?.username ? 'border-red-400' : ""}`} placeholder="Username" {...register("username", { required: true, maxLength: 20 })} />
-                <input type="email" id='email' className={`border p-3 rounded-lg ${errors?.email ? 'border-red-400' : ""}`} placeholder="Email" {...register("email", { required: 'Email required' })} />
-                <input type="password" id='password' className={`border p-3 rounded-lg ${errors?.password ? 'border-red-400' : ""}`} placeholder="Password" {...register("password", { required: 'Password is required', maxLength: 8 })} />
-                <button disabled={isLoading} className='bg-[#009688] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
+        <>
+            <div className='px-3 max-w-lg mx-auto'>
+                <h1 className='text-3xl text-center font-semibold my-7' >Profile</h1>
+                <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4 mb-2'>
+                    <input onChange={(e) => setFile(e.target.files[0])} hidden ref={fileRef} type="file" name="" id="" accept='image/*' />
+                    <img
+                        onClick={() => fileRef.current.click()}
+                        alt=""
+                        src={imageUrl || currentuser?.avatar}
+                        className={`cursor-pointer self-center my-2 object-cover size-20 rounded-full ${uploading ? "ring-4 ring-[#009688] animate-pulse" : "ring-2 ring-black "} `}
+                    />
+                    <input type="text" id='username' className={`border p-3 rounded-lg ${errors?.username ? 'border-red-400' : ""}`} placeholder="Username" {...register("username", { required: true, maxLength: 20 })} />
+                    <input type="email" id='email' className={`border p-3 rounded-lg ${errors?.email ? 'border-red-400' : ""}`} placeholder="Email" {...register("email", { required: 'Email required' })} />
+                    <input type="password" id='password' className={`border p-3 rounded-lg ${errors?.password ? 'border-red-400' : ""}`} placeholder="Password" {...register("password", { required: 'Password is required', maxLength: 8 })} />
+                    <button disabled={isLoading} className='bg-[#009688] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
+                        <span className='flex items-center justify-center gap-2 my-auto'>
+                            <span>UPDATE</span>
+                            {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
+                        </span>
+                    </button>
+                    <button onClick={() => navigate('/create-listing')} className='bg-[#F9826C] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
+                        <span className='flex items-center justify-center gap-2 my-auto'>
+                            <span>Create Listing</span>
+                        </span>
+                    </button>
+                    {isSuccess && <p className='text-green-600 text-center'>User Updated!</p>}
+                    {isDeleteSuccess && <p className='text-green-600 text-center'>User Deleted!</p>}
+                    {isError && <p className='text-red-400 text-center'>Failed Updating User!</p>}
+                    {DeleteIsError && <p className='text-red-400 text-center'>Failed Deleting User!</p>}
+                    <div className="flex justify-between">
+                        <div onClick={() => deleteUserHandler(currentuser?._id)} className={`text-red-500 cursor-pointer ${isDeleteLoading && 'animate-pulse'}`}>Delete Account</div>
+                        <div onClick={signOutUserHandler} className="text-red-500 cursor-pointer">Sign Out</div>
+                    </div>
+                </form>
+                {listingData?.length > 0 && <button disabled={isLoading} onClick={() => refetch()} className='text-[#009688] text-center mt-6 w-full' type="submit">
                     <span className='flex items-center justify-center gap-2 my-auto'>
-                        <span>UPDATE</span>
-                        {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
+                        <span>Show Listing </span>
+                        {isListingLoading && <FaSpinner className='mt-[1px] animate-spin' />}
                     </span>
-                </button>
-                <button onClick={() => navigate('/create-listing')} className='bg-[#F9826C] text-white p-2 rounded-md uppercase disabled:opacity-40 hover:opacity-90' type="submit">
-                    <span className='flex items-center justify-center gap-2 my-auto'>
-                        <span>Create Listing</span>
-                    </span>
-                </button>
-                {isSuccess && <p className='text-green-600 text-center'>User Updated!</p>}
-                {isDeleteSuccess && <p className='text-green-600 text-center'>User Deleted!</p>}
-                {isError && <p className='text-red-400 text-center'>Failed Updating User!</p>}
-                {DeleteIsError && <p className='text-red-400 text-center'>Failed Deleting User!</p>}
-                <div className="flex justify-between">
-                    <div onClick={() => deleteUserHandler(currentuser?._id)} className={`text-red-500 cursor-pointer ${isDeleteLoading && 'animate-pulse'}`}>Delete Account</div>
-                    <div className="text-red-500 cursor-pointer">Sign Out</div>
-                </div>
-            </form>
-        </div>
+                </button>}
+
+            </div>
+            {listingData?.map((list, id) => {
+                return (<div className="flex justify-between py-3 max-w-xl mx-auto">
+                    <div className="flex justify-between items-center gap-2">
+                        {/* You can display an image if needed */}
+                        {list?.imageUrls && list.imageUrls[0] && (
+                            <img src={list?.imageUrls[0]} alt={list.name} className="p-1 w-28 rounded border-2 border-[#F9826C] h-20 object-cover" />
+                        )}
+                        <p>{list?.name}</p>
+                    </div>
+                    <div className="flex gap-4">
+                        <button disabled={isLoading} className='text-red-600 ' type="submit">
+                            <span className='flex items-center justify-center gap-2 my-auto'>
+                                <span>Delete</span>
+                                {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
+                            </span>
+                        </button>
+                        <button disabled={isLoading} className='text-[#009688]' type="submit">
+                            <span className='flex items-center justify-center gap-2 my-auto'>
+                                <span>Edit</span>
+                                {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
+                            </span>
+                        </button>
+                    </div>
+                </div>)
+            })}
+        </>
     )
 }
 
