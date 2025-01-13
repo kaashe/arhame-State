@@ -9,6 +9,13 @@ export const listingApi = baseApi.injectEndpoints({
         body: body,
       }),
     }),
+    deleteListing: builder.mutation({
+      query: (id) => ({
+        url: `listing/delete/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
-export const { useCreateListingMutation } = listingApi;
+export const { useCreateListingMutation, useDeleteListingMutation } =
+  listingApi;

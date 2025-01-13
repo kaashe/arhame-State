@@ -6,6 +6,7 @@ import axios from 'axios';
 import { signInSuccess } from '../store/user/userSlice';
 import { useDeleteteUserMutation, useGetListingQuery, useUpdateUserMutation } from '../store/api/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { useDeleteListingMutation } from '../store/api/listingSlice';
 const Profile = () => {
     const fileRef = useRef();
     const dispatch = useDispatch();
@@ -16,6 +17,7 @@ const Profile = () => {
     const currentuser = useSelector((state) => state?.user?.currentuser);
     const id = currentuser?._id || currentuser?.id;
     const [updateUser, { isLoading, isSuccess, isError, error }] = useUpdateUserMutation();
+    const [deleteListing, { isLoading: isDeleteListingIsLoading, isSuccess: isDeleteListingIsSuccess, isError: DeleteListingIsisError, error: errorDeleteListing }] = useDeleteListingMutation();
     const [deleteUser, { isLoading: isDeleteLoading, isSuccess: isDeleteSuccess, isError: DeleteIsError, error: DeletError }] = useDeleteteUserMutation();
     const { data: listingData, isLoading: isListingLoading, isError: ListingisError, refetch } = useGetListingQuery(id);
     const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm();
@@ -113,8 +115,20 @@ const Profile = () => {
             });
             setImageUrl(currentuser?.photoURL || currentuser?.avatar || '');
         }
-    }, [reset, currentuser]);
+        if (isDeleteListingIsSuccess) {
+            refetch();
+        }
 
+    }, [reset, currentuser, isDeleteListingIsSuccess]);
+    const handleDelete = async (id) => {
+        try {
+            await deleteListing(id);
+            console.log(id, 'iddd');
+        } catch (error) {
+            console.log("Error while deleting list item: ", error.message);
+        }
+
+    }
     return (
         <>
             <div className='px-3 max-w-lg mx-auto'>
@@ -143,6 +157,7 @@ const Profile = () => {
                     </button>
                     {isSuccess && <p className='text-green-600 text-center'>User Updated!</p>}
                     {isDeleteSuccess && <p className='text-green-600 text-center'>User Deleted!</p>}
+                    {isDeleteListingIsSuccess && <p className='text-green-600 text-center'>Listing Deleted!</p>}
                     {isError && <p className='text-red-400 text-center'>Failed Updating User!</p>}
                     {DeleteIsError && <p className='text-red-400 text-center'>Failed Deleting User!</p>}
                     <div className="flex justify-between">
@@ -159,7 +174,7 @@ const Profile = () => {
 
             </div>
             {listingData?.map((list, id) => {
-                return (<div className="flex justify-between py-3 max-w-xl mx-auto">
+                return (<div key={id} className="flex justify-between py-3 max-w-xl mx-auto">
                     <div className="flex justify-between items-center gap-2">
                         {/* You can display an image if needed */}
                         {list?.imageUrls && list.imageUrls[0] && (
@@ -168,7 +183,7 @@ const Profile = () => {
                         <p>{list?.name}</p>
                     </div>
                     <div className="flex gap-4">
-                        <button disabled={isLoading} className='text-red-600 ' type="submit">
+                        <button onClick={() => handleDelete(list?._id)} disabled={isDeleteListingIsLoading} className='text-red-600 ' type="submit">
                             <span className='flex items-center justify-center gap-2 my-auto'>
                                 <span>Delete</span>
                                 {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
