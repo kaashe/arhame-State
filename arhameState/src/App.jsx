@@ -21,6 +21,7 @@ function App() {
         <Route element={<ProtectRoute />}>
           <Route path='/profile' element={<Profile />}></Route>
           <Route path='/create-listing' element={<CreateListing />}></Route>
+          <Route path='/update-listing/:id' element={<CreateListing />}></Route>
         </Route>
         <Route path='/sign-in' element={<SignIn />}></Route>
         <Route path='/sign-up' element={<SigUp />}></Route>

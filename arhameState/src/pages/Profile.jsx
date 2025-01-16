@@ -22,6 +22,8 @@ const Profile = () => {
     const { data: listingData, isLoading: isListingLoading, isError: ListingisError, refetch } = useGetListingQuery(id);
     const { register, reset, handleSubmit, formState: { errors, isDirty } } = useForm();
     console.log(listingData, 'listingData');
+    console.log(id, 'user id');
+
 
     const handleImageUpload = async () => {
         console.log('process started');
@@ -129,6 +131,9 @@ const Profile = () => {
         }
 
     }
+    const handleEdit = async (id) => {
+        navigate(`/update-listing/${id}`)
+    }
     return (
         <>
             <div className='px-3 max-w-lg mx-auto'>
@@ -189,7 +194,7 @@ const Profile = () => {
                                 {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}
                             </span>
                         </button>
-                        <button disabled={isLoading} className='text-[#009688]' type="submit">
+                        <button onClick={() => handleEdit(list?._id)} disabled={isLoading} className='text-[#009688]' type="submit">
                             <span className='flex items-center justify-center gap-2 my-auto'>
                                 <span>Edit</span>
                                 {isLoading && <FaSpinner className='mt-[1px] animate-spin' />}

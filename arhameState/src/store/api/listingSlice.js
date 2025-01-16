@@ -15,7 +15,16 @@ export const listingApi = baseApi.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getSingleListing: builder.query({
+      query: (id) => ({
+        url: `listing/get/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
-export const { useCreateListingMutation, useDeleteListingMutation } =
-  listingApi;
+export const {
+  useCreateListingMutation,
+  useDeleteListingMutation,
+  useGetSingleListingQuery,
+} = listingApi;
